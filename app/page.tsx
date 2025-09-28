@@ -1,14 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -213,198 +205,211 @@ export default function Home() {
 
   return (
     <div
-      className="h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex flex-col overflow-hidden"
+      className="h-screen bg-background flex overflow-hidden"
       onKeyDown={handleKeyDown}
       tabIndex={0}
     >
-      <div className="container mx-auto max-w-4xl p-4 flex flex-col h-full min-h-0">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="flex-1 flex flex-col min-h-0"
+      {/* Sidebar with icon tabs */}
+      <div className="w-16 bg-card border-r border-border flex flex-col items-center py-4 gap-2">
+        <button
+          onClick={() => setActiveTab("chat")}
+          className={`p-3 rounded-lg transition-colors ${
+            activeTab === "chat"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "hover:bg-accent text-muted-foreground hover:text-accent-foreground"
+          }`}
+          title="Chat"
         >
-          <TabsList className="grid w-full grid-cols-2 mb-4 flex-shrink-0">
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" />
-              Chat
-            </TabsTrigger>
-            <TabsTrigger
-              value="personality"
-              className="flex items-center gap-2"
-            >
-              <Settings className="w-4 h-4" />
-              Personality
-            </TabsTrigger>
-          </TabsList>
+          <MessageCircle className="w-5 h-5" />
+        </button>
 
-          <TabsContent value="chat" className="flex-1 flex flex-col min-h-0">
-            <Card className="flex-1 flex flex-col min-h-0">
-              <CardHeader className="pb-4 flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5" />
-                    <CardTitle>AI Chat Assistant</CardTitle>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleResetConversation}
-                    className="flex items-center gap-2"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Reset
-                  </Button>
-                </div>
-              </CardHeader>
+        <button
+          onClick={() => setActiveTab("personality")}
+          className={`p-3 rounded-lg transition-colors ${
+            activeTab === "personality"
+              ? "bg-primary text-primary-foreground shadow-md"
+              : "hover:bg-accent text-muted-foreground hover:text-accent-foreground"
+          }`}
+          title="Personality"
+        >
+          <Settings className="w-5 h-5" />
+        </button>
 
-              <CardContent className="flex-1 flex flex-col min-h-0 p-4">
-                <ScrollArea
-                  ref={scrollAreaRef}
-                  className="flex-1 min-h-0 pr-4 mb-4"
-                >
-                  <div className="space-y-4">
-                    {messages.length === 0 && (
-                      <div className="text-center text-muted-foreground py-16 flex flex-col items-center justify-center">
-                        <MessageCircle className="w-8 h-8 mx-auto mb-4 opacity-50" />
-                        <p className="text-xs">
-                          Start a conversation by typing a message below
-                        </p>
-                      </div>
-                    )}
+        {/* Reset button for chat */}
+        {activeTab === "chat" && (
+          <button
+            onClick={handleResetConversation}
+            className="p-3 rounded-lg hover:bg-accent text-muted-foreground hover:text-accent-foreground transition-colors mt-auto"
+            title="Reset Conversation"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        )}
+      </div>
 
-                    {messages.map((message) => (
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-h-0 max-w-5xl mx-auto">
+        {activeTab === "chat" && (
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Chat header */}
+            <div className="px-6 py-4  ">
+              <h1 className="text-xl font-semibold">Communication Assistant</h1>
+              <p className="text-sm text-muted-foreground">
+                Choose from personalized response options
+              </p>
+            </div>
+
+            {/* Messages area */}
+            <div className="flex-1 flex flex-col min-h-0 p-6">
+              <ScrollArea
+                ref={scrollAreaRef}
+                className="flex-1 min-h-0 pr-4 mb-4"
+              >
+                <div className="space-y-4">
+                  {messages.length === 0 && (
+                    <div className="text-center text-muted-foreground py-16 flex flex-col items-center justify-center">
+                      <MessageCircle className="w-8 h-8 mx-auto mb-4 opacity-50" />
+                      <p className="text-xs">
+                        Start a conversation by typing a message below
+                      </p>
+                    </div>
+                  )}
+
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${
+                        message.type === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
                       <div
-                        key={message.id}
-                        className={`flex ${
+                        className={`max-w-[80%] rounded-lg p-3 ${
                           message.type === "user"
-                            ? "justify-end"
-                            : "justify-start"
+                            ? "bg-primary text-primary-foreground ml-4"
+                            : "bg-muted mr-4"
                         }`}
                       >
-                        <div
-                          className={`max-w-[80%] rounded-lg p-3 ${
-                            message.type === "user"
-                              ? "bg-primary text-primary-foreground ml-4"
-                              : "bg-muted mr-4"
-                          }`}
-                        >
-                          <p className="mb-2 text-xs">{message.content}</p>
+                        <p className="mb-2 text-xs">{message.content}</p>
 
-                          {message.options && (
-                            <div className="space-y-2 mt-3">
-                              {message.options.map((option, index) => (
-                                <Button
-                                  key={index}
-                                  variant={
-                                    pendingMessageId === message.id &&
-                                    selectedOptionIndex === index
-                                      ? "default"
-                                      : "outline"
-                                  }
-                                  size="sm"
-                                  className="w-full text-left justify-start h-auto p-3 whitespace-normal"
-                                  onClick={() =>
-                                    handleOptionSelect(message.id, index)
-                                  }
-                                >
-                                  <span className="text-xs">{option}</span>
-                                </Button>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="text-xs opacity-70 mt-2">
-                            {message.timestamp.toLocaleTimeString()}
+                        {message.options && (
+                          <div className="space-y-2 mt-3">
+                            {message.options.map((option, index) => (
+                              <Button
+                                key={index}
+                                variant={
+                                  pendingMessageId === message.id &&
+                                  selectedOptionIndex === index
+                                    ? "default"
+                                    : "outline"
+                                }
+                                size="sm"
+                                className="w-full text-left justify-start h-auto p-3 whitespace-normal"
+                                onClick={() =>
+                                  handleOptionSelect(message.id, index)
+                                }
+                              >
+                                <span className="text-xs">{option}</span>
+                              </Button>
+                            ))}
                           </div>
+                        )}
+
+                        <div className="text-xs opacity-70 mt-2">
+                          {message.timestamp.toLocaleTimeString()}
                         </div>
                       </div>
-                    ))}
+                    </div>
+                  ))}
 
-                    {isLoading && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted rounded-lg p-3 mr-4">
-                          <div className="flex items-center space-x-2">
-                            <div className="animate-pulse flex space-x-1">
-                              <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                              <div
-                                className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                                style={{ animationDelay: "0.1s" }}
-                              ></div>
-                              <div
-                                className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                                style={{ animationDelay: "0.2s" }}
-                              ></div>
-                            </div>
-                            <span className="text-xs text-muted-foreground">
-                              Generating responses...
-                            </span>
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-muted rounded-lg p-3 mr-4">
+                        <div className="flex items-center space-x-2">
+                          <div className="animate-pulse flex space-x-1">
+                            <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                            <div
+                              className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                              style={{ animationDelay: "0.1s" }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
+                              style={{ animationDelay: "0.2s" }}
+                            ></div>
                           </div>
+                          <span className="text-xs text-muted-foreground">
+                            Generating responses...
+                          </span>
                         </div>
                       </div>
-                    )}
-                  </div>
-                </ScrollArea>
-
-                <div className="flex gap-2 flex-shrink-0">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Type your message..."
-                    disabled={isLoading}
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={isLoading || !inputValue.trim()}
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </ScrollArea>
 
-          <TabsContent
-            value="personality"
-            className="flex-1 flex flex-col min-h-0"
-          >
-            <Card className="flex-1 flex flex-col min-h-0">
-              <CardHeader className="flex-shrink-0">
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Personality Settings
-                </CardTitle>
-              </CardHeader>
+              {/* Input area */}
+              <div className="flex gap-2 flex-shrink-0">
+                <Input
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="Type your message..."
+                  disabled={isLoading}
+                  className="bg-background h-10"
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  size="icon"
+                  disabled={isLoading || !inputValue.trim()}
+                  className="size-10"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
-              <CardContent className="flex-1 flex flex-col space-y-4">
-                <div className="flex-1 flex flex-col">
-                  <label className="text-sm font-medium mb-2 block">
-                    AI Personality Description
-                  </label>
-                  <Textarea
-                    value={personality.description}
-                    onChange={(e) => handlePersonalityUpdate(e.target.value)}
-                    placeholder="Describe how you want the AI to behave. For example: 'You are a helpful coding assistant who explains things clearly and provides practical examples. You're patient, encouraging, and focus on best practices. You prefer concise but thorough explanations.'"
-                    className="flex-1 min-h-[200px] resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Write a detailed description of how you want the AI to
-                    behave, its tone, expertise areas, and response style.
-                  </p>
-                </div>
+        {activeTab === "personality" && (
+          <div className="flex-1 flex flex-col min-h-0">
+            {/* Personality header */}
+            <div className="px-6 py-4 ">
+              <h1 className="text-xl font-semibold">Personality Settings</h1>
+              <p className="text-sm text-muted-foreground">
+                Describe how you want the AI to behave and respond
+              </p>
+            </div>
 
-                <div className="flex gap-2 flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    onClick={() => setPersonality(defaultPersonality)}
-                    className="flex-1"
-                  >
-                    Reset to Default
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            {/* Personality content */}
+            <div className="flex-1 flex flex-col p-6 space-y-4">
+              <div className="flex-1 flex flex-col">
+                <label className="text-sm font-medium mb-2 block">
+                  AI Personality Description
+                </label>
+                <Textarea
+                  value={personality.description}
+                  onChange={(e) => handlePersonalityUpdate(e.target.value)}
+                  placeholder="Describe how you want the AI to behave. For example: 'You are a helpful coding assistant who explains things clearly and provides practical examples. You're patient, encouraging, and focus on best practices. You prefer concise but thorough explanations.'"
+                  className="flex-1 min-h-[200px] resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Write a detailed description of how you want the AI to behave,
+                  its tone, expertise areas, and response style.
+                </p>
+              </div>
+
+              <div className="flex gap-2 flex-shrink-0">
+                <Button
+                  variant="outline"
+                  onClick={() => setPersonality(defaultPersonality)}
+                  className="flex-1"
+                >
+                  Reset to Default
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
